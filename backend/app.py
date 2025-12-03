@@ -171,11 +171,21 @@ def dashboard_student():
     if current_user.role != "participant":
         return "Access Denied"
     
+    # 1. Get ALL events (for the browse section)
     all_events = Event.query.all()
+    
+    # 2. Get the specific Event objects the student is registered for
+    #    (We join the Registration and Event tables)
     my_registrations = Registration.query.filter_by(student_id=current_user.id).all()
     my_event_ids = [r.event_id for r in my_registrations]
     
-    return render_template("dashboard_student.html", events=all_events, my_event_ids=my_event_ids)
+    # Create a list of full Event objects that the student has registered for
+    my_events_list = [Event.query.get(id) for id in my_event_ids]
+    
+    return render_template("dashboard_student.html", 
+                         events=all_events, 
+                         my_event_ids=my_event_ids, 
+                         my_events_list=my_events_list)
 
 @app.route("/register/<int:event_id>")
 @login_required

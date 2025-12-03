@@ -1,51 +1,96 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Student Dashboard</h2>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-    {% for event in events %}
-    <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-        <img src="{{ url_for('static', filename='uploads/' + event.image_file) }}" style="width: 100%; height: 200px; object-fit: cover;">
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+
+<div style="margin-bottom: 30px;">
+    <h2>👋 Welcome back, {{ current_user.name }}!</h2>
+    <div style="display: flex; gap: 20px;">
+        <div class="card" style="flex: 1; padding: 15px; background: #e0f2fe; margin-bottom: 0; text-align: center;">
+            <h1 style="margin: 0; color: var(--primary);">{{ my_events_list|length }}</h1>
+            <p style="margin: 0;">Events Registered</p>
+        </div>
+        <div class="card" style="flex: 1; padding: 15px; background: #dcfce7; margin-bottom: 0; text-align: center;">
+            <h1 style="margin: 0; color: var(--success);">{{ events|length }}</h1>
+            <p style="margin: 0;">Total Events Available</p>
+        </div>
+    </div>
+</div>
+
+<div style="display: flex; gap: 30px; flex-wrap: wrap;">
+    
+    <div style="flex: 2; min-width: 300px;">
         
-        <div style="padding: 20px; flex-grow: 1;">
-            <h3>{{ event.name }}</h3>
-            <p style="color: #666; margin: 5px 0;">
-    📅 
-    {% if event.start_date == event.end_date %}
-        {{ event.start_date }} {% else %}
-        {{ event.start_date }} to {{ event.end_date }}
-    {% endif %}
-</p>
-            <p style="color: #666; margin: 5px 0;">⏰ {{ event.start_time }} - {{ event.end_time }}</p>
-            <p>{{ event.description[:100] }}...</p>
+        <div class="card">
+            <h3>📅 Event Calendar</h3>
+            <div id='calendar'></div>
         </div>
 
-        <div style="padding: 20px; border-top: 1px solid #eee;">
-            {% if event.id in my_event_ids %}
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <button style="background-color: var(--success); cursor: default; flex: 1;">✅ Registered</button>
-                    <a href="{{ url_for('unregister_event', event_id=event.id) }}" 
-                       onclick="return confirm('Cancel registration?');" style="flex: 1;">
-                        <button style="background-color: var(--danger);">Cancel</button>
-                    </a>
-                </div>
+        <div class="card">
+            <h3>✅ My Registered Events</h3>
+            {% if my_events_list %}
+                <ul style="list-style: none; padding: 0;">
+                    {% for event in my_events_list %}
+                    <li style="border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>{{ event.name }}</strong>
+                            <br>
+                            <small style="color: #666;">{{ event.start_date }} @ {{ event.start_time }}</small>
+                        </div>
+                        <a href="{{ url_for('unregister_event', event_id=event.id) }}" 
+                           onclick="return confirm('Cancel registration?');">
+                            <button style="background: var(--danger); padding: 5px 10px; font-size: 0.8rem; width: auto;">Cancel</button>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
             {% else %}
-                <button 
-                    class="view-btn"
-                    data-name="{{ event.name }}"
-                    data-date="{{ event.start_date }} to {{ event.end_date }}"
-                    data-start="{{ event.start_time }}"
-                    data-end="{{ event.end_time }}"
-                    data-desc="{{ event.description }}"
-                    data-img="{{ url_for('static', filename='uploads/' + event.image_file) }}"
-                    data-id="{{ event.id }}"
-                    onclick="openModalFromData(this)">
-                    View Details & Register
-                </button>
+                <p style="color: #666; font-style: italic;">You haven't registered for any events yet.</p>
             {% endif %}
         </div>
     </div>
-    {% endfor %}
+
+    <div style="flex: 3; min-width: 300px;">
+        <h3>🎉 Browse All Events</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+            {% for event in events %}
+            <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                <img src="{{ url_for('static', filename='uploads/' + event.image_file) }}" style="width: 100%; height: 150px; object-fit: cover;">
+                
+                <div style="padding: 15px; flex-grow: 1;">
+                    <h4 style="margin: 0 0 10px 0;">{{ event.name }}</h4>
+                    <p style="color: #666; margin: 5px 0; font-size: 0.9rem;">📅 
+                        {% if event.start_date == event.end_date %}
+                            {{ event.start_date }}
+                        {% else %}
+                            {{ event.start_date }} - {{ event.end_date }}
+                        {% endif %}
+                    </p>
+                    <p style="color: #666; margin: 5px 0; font-size: 0.9rem;">⏰ {{ event.start_time }}</p>
+                </div>
+
+                <div style="padding: 15px; border-top: 1px solid #eee;">
+                    {% if event.id in my_event_ids %}
+                        <button style="background-color: var(--success); cursor: default; opacity: 0.8;">Registered</button>
+                    {% else %}
+                        <button 
+                            class="view-btn"
+                            data-name="{{ event.name }}"
+                            data-date="{{ event.start_date }}"
+                            data-start="{{ event.start_time }}"
+                            data-end="{{ event.end_time }}"
+                            data-desc="{{ event.description }}"
+                            data-img="{{ url_for('static', filename='uploads/' + event.image_file) }}"
+                            data-id="{{ event.id }}"
+                            onclick="openModalFromData(this)">
+                            View & Register
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
 <div id="eventModal" class="modal">
@@ -57,13 +102,47 @@
         <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0; max-height: 200px; overflow-y: auto;">
             <p id="modalDesc"></p>
         </div>
-        <p style="color: var(--danger); font-size: 0.9rem;">⚠️ By clicking confirm, you agree to attend this event.</p>
+        <p style="color: var(--danger); font-size: 0.9rem;">⚠️ Confirm registration?</p>
         <a id="confirmBtn" href="#"><button>Confirm Registration</button></a>
     </div>
 </div>
 
 <script>
+    // --- CALENDAR SETUP ---
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: 400,
+            headerToolbar: {
+                left: 'prev,next',
+                center: 'title',
+                right: 'dayGridMonth,listWeek'
+            },
+            events: [
+                // Loop through all events to show them on calendar
+                // We highlight the ones the user is registered for in a different color
+                {% for event in events %}
+                {
+                    title: '{{ event.name }}',
+                    start: '{{ event.start_date }}',
+                    end: '{{ event.end_date }}', // FullCalendar end is exclusive, but for visual this works
+                    {% if event.id in my_event_ids %}
+                        color: '#10b981', // Green for registered
+                        title: '✅ {{ event.name }}'
+                    {% else %}
+                        color: '#3b82f6', // Blue for available
+                    {% endif %}
+                },
+                {% endfor %}
+            ]
+        });
+        calendar.render();
+    });
+
+    // --- MODAL LOGIC (Same as before) ---
     function openModalFromData(btn) {
+        // ... (Keep existing modal logic here) ...
         var name = btn.getAttribute('data-name');
         var date = btn.getAttribute('data-date');
         var start = btn.getAttribute('data-start');
@@ -83,8 +162,7 @@
     }
 
     function closeModal() { document.getElementById('eventModal').style.display = "none"; }
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('eventModal')) { closeModal(); }
-    }
+    window.onclick = function(event) { if (event.target == document.getElementById('eventModal')) closeModal(); }
 </script>
+
 {% endblock %}
