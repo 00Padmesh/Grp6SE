@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Student Dashboard</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+    {% for event in events %}
+    <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+        <img src="{{ url_for('static', filename='uploads/' + event.image_file) }}" style="width: 100%; height: 200px; object-fit: cover;">
+        
+        <div style="padding: 20px; flex-grow: 1;">
+            <h3>{{ event.name }}</h3>
+            <p style="color: #666; margin: 5px 0;">
+    📅 
+    {% if event.start_date == event.end_date %}
+        {{ event.start_date }} {% else %}
+        {{ event.start_date }} to {{ event.end_date }}
+    {% endif %}
+</p>
+            <p style="color: #666; margin: 5px 0;">⏰ {{ event.start_time }} - {{ event.end_time }}</p>
+            <p>{{ event.description[:100] }}...</p>
+        </div>
+
+        <div style="padding: 20px; border-top: 1px solid #eee;">
+            {% if event.id in my_event_ids %}
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button style="background-color: var(--success); cursor: default; flex: 1;">✅ Registered</button>
+                    <a href="{{ url_for('unregister_event', event_id=event.id) }}" 
+                       onclick="return confirm('Cancel registration?');" style="flex: 1;">
+                        <button style="background-color: var(--danger);">Cancel</button>
+                    </a>
+                </div>
+            {% else %}
+                <button 
+                    class="view-btn"
+                    data-name="{{ event.name }}"
+                    data-date="{{ event.start_date }} to {{ event.end_date }}"
+                    data-start="{{ event.start_time }}"
+                    data-end="{{ event.end_time }}"
+                    data-desc="{{ event.description }}"
+                    data-img="{{ url_for('static', filename='uploads/' + event.image_file) }}"
+                    data-id="{{ event.id }}"
+                    onclick="openModalFromData(this)">
+                    View Details & Register
+                </button>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img id="modalImg" src="" style="width:100%; height:250px; object-fit:cover; border-radius:8px;">
+        <h2 id="modalTitle" style="margin-top: 15px;"></h2>
+        <p><strong id="modalDate"></strong> | <span id="modalTime"></span></p>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0; max-height: 200px; overflow-y: auto;">
+            <p id="modalDesc"></p>
+        </div>
+        <p style="color: var(--danger); font-size: 0.9rem;">⚠️ By clicking confirm, you agree to attend this event.</p>
+        <a id="confirmBtn" href="#"><button>Confirm Registration</button></a>
+    </div>
+</div>
+
+<script>
+    function openModalFromData(btn) {
+        var name = btn.getAttribute('data-name');
+        var date = btn.getAttribute('data-date');
+        var start = btn.getAttribute('data-start');
+        var end = btn.getAttribute('data-end');
+        var desc = btn.getAttribute('data-desc');
+        var imgUrl = btn.getAttribute('data-img');
+        var eventId = btn.getAttribute('data-id');
+
+        document.getElementById('modalTitle').innerText = name;
+        document.getElementById('modalDate').innerText = "📅 " + date;
+        document.getElementById('modalTime').innerText = "⏰ " + start + " - " + end;
+        document.getElementById('modalDesc').innerText = desc;
+        document.getElementById('modalImg').src = imgUrl;
+        
+        document.getElementById('confirmBtn').href = "/register/" + eventId;
+        document.getElementById('eventModal').style.display = "block";
+    }
+
+    function closeModal() { document.getElementById('eventModal').style.display = "none"; }
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('eventModal')) { closeModal(); }
+    }
+</script>
+{% endblock %}

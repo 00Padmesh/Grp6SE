@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>Participants for: {{ event.name }}</h2>
+    <a href="{{ url_for('dashboard_organizer') }}"><button style="width: auto; background: #666;">Back to Dashboard</button></a>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>Registered List</h3>
+        <a href="{{ url_for('download_participants', event_id=event.id) }}">
+            <button style="width: auto; background-color: var(--success);">Download CSV</button>
+        </a>
+    </div>
+
+    {% if event.registrations %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Student ID</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reg in event.registrations %}
+            <tr>
+                <td>{{ reg.student.name }}</td>
+                <td>{{ reg.student.unique_id }}</td>
+                <td>{{ reg.student.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No participants have registered yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

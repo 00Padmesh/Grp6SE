@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="text-align: center; margin-top: 50px;">
+    <h1>Welcome to the Annual Tech Fest</h1>
+    <p>Join coding wars, hackathons, and gaming events.</p>
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('login') }}"><button style="width: 200px;">Login</button></a>
+        <br><br>
+        <a href="{{ url_for('signup') }}"><button style="width: 200px; background-color: var(--secondary);">Sign Up</button></a>
+    </div>
+</div>
+{% endblock %}

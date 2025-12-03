@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 0 auto;">
+    <h2 style="text-align: center;">Join the Fest</h2>
+    <form method="POST">
+        <label>I am a:</label>
+        <select name="role" id="roleSelect" onchange="toggleFields()">
+            <option value="participant">Participant (Student)</option>
+            <option value="organizer">Organizer (Event Head)</option>
+        </select>
+
+        <label>Full Name</label>
+        <input type="text" name="name" placeholder="Your Full Name" required>
+
+        <label>Email</label>
+        <input type="email" name="email" required>
+        
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <div id="studentIdField">
+            <label>Student ID / Roll No:</label>
+            <input type="text" name="unique_id" placeholder="e.g. CSE-22-01">
+        </div>
+
+        <div id="secretCode" style="display:none;">
+            <label style="color:var(--danger)">Organizer Code:</label>
+            <input type="password" name="secret_code">
+        </div>
+
+        <button type="submit">Sign Up</button>
+    </form>
+    <p style="text-align:center; margin-top:10px;"><a href="{{ url_for('login') }}">Login</a></p>
+</div>
+
+<script>
+    function toggleFields() {
+        var role = document.getElementById("roleSelect").value;
+        var organizerBox = document.getElementById("secretCode");
+        var studentBox = document.getElementById("studentIdField");
+
+        if (role === "organizer") {
+            organizerBox.style.display = "block";
+            studentBox.style.display = "none";
+        } else {
+            organizerBox.style.display = "none";
+            studentBox.style.display = "block";
+        }
+    }
+</script>
+{% endblock %}
