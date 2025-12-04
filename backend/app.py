@@ -50,6 +50,8 @@ def signup():
         
         # Logic for ID: Required for Students, Optional for Organizers
         unique_id = request.form.get("unique_id") 
+        if not unique_id:
+            unique_id = None
         if role == "participant":
             if not unique_id:
                 flash("Student ID is required for participants")
@@ -135,8 +137,9 @@ def dashboard_organizer():
         db.session.commit()
         flash("Event Created Successfully!")
     
-    my_events = Event.query.filter_by(organizer_id=current_user.id).all()
-    return render_template("dashboard_organizer.html", events=my_events)
+    #my_events = Event.query.filter_by(organizer_id=current_user.id).all()
+    all_events = Event.query.all()
+    return render_template("dashboard_organizer.html", events=all_events)
 
 # --- VIEW PARTICIPANTS ROUTE (NEW) ---
 @app.route("/participants/<int:event_id>")
@@ -238,5 +241,44 @@ def delete_event(event_id):
     flash("Event deleted")
     return redirect(url_for("dashboard_organizer"))
 
+
+# app.py
+
+@app.route("/event/edit/<int:event_id>", methods=["GET", "POST"])
+@login_required
+def edit_event(event_id):
+    event = Event.query.get_or_404(event_id)
+
+    # SECURITY CHECK: Stop Admin 2 from editing Admin 1's event
+    if event.organizer_id != current_user.id:
+        return "Access Denied"
+
+    if request.method == "POST":
+        # Get data from form
+        event.name = request.form["name"]
+        event.start_date = request.form["start_date"]
+        event.end_date = request.form["end_date"]
+        event.start_time = request.form["start_time"]
+        event.end_time = request.form["end_time"]
+        event.description = request.form["description"]
+
+        # Date Validation again
+        if event.end_date < event.start_date:
+            flash("Error: End date cannot be before Start date!")
+            return redirect(url_for('edit_event', event_id=event.id))
+
+        # Handle Image Update (Optional)
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename != '' and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                event.image_file = filename
+
+        db.session.commit()
+        flash("Event Updated Successfully!")
+        return redirect(url_for("dashboard_organizer"))
+
+    return render_template("edit_event.html", event=event)
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>✏️ Edit Event</h2>
+        <a href="{{ url_for('dashboard_organizer') }}" style="color: #666; text-decoration: none;">Cancel</a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label>Event Name</label>
+        <input type="text" name="name" value="{{ event.name }}" required>
+
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label>Start Date</label>
+                <input type="date" name="start_date" value="{{ event.start_date }}" required>
+            </div>
+            <div style="flex: 1;">
+                <label>End Date</label>
+                <input type="date" name="end_date" value="{{ event.end_date }}" required>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label>Start Time</label>
+                <input type="time" name="start_time" value="{{ event.start_time }}" required>
+            </div>
+            <div style="flex: 1;">
+                <label>End Time</label>
+                <input type="time" name="end_time" value="{{ event.end_time }}" required>
+            </div>
+        </div>
+
+        <label>Description</label>
+        <textarea name="description" rows="5" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;" required>{{ event.description }}</textarea>
+
+        <label style="margin-top: 15px;">Update Banner Image (Leave empty to keep current)</label>
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+            <img src="{{ url_for('static', filename='uploads/' + event.image_file) }}" width="60" height="60" style="object-fit: cover; border-radius: 4px;">
+            <input type="file" name="image" accept="image/*">
+        </div>
+
+        <button type="submit" style="background-color: #f59e0b;">Update Event</button>
+    </form>
+</div>
+{% endblock %}
