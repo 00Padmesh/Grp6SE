@@ -50,9 +50,16 @@ def signup():
         
         # Logic for ID: Required for Students, Optional for Organizers
         unique_id = request.form.get("unique_id") 
-        if role == "participant" and not unique_id:
-            flash("Student ID is required for participants")
-            return redirect(url_for("signup"))
+        if role == "participant":
+            if not unique_id:
+                flash("Student ID is required for participants")
+                return redirect(url_for("signup"))
+            
+            # NEW CHECK: Check if this Student ID already exists in DB
+            existing_student = User.query.filter_by(unique_id=unique_id).first()
+            if existing_student:
+                flash("This Student ID is already registered! Please login.")
+                return redirect(url_for("signup"))
 
         if role == "organizer":
             if request.form.get("secret_code") != ORGANIZER_CODE:
@@ -106,7 +113,9 @@ def dashboard_organizer():
         start_time = request.form["start_time"]
         end_time = request.form["end_time"]
         desc = request.form["description"]
-        
+        if end_date < start_date:
+            flash("Error: End date cannot be before Start date!")
+            return redirect(url_for("dashboard_organizer"))
         # Image Upload Handling (Optional now)
         image_filename = 'default.jpg'
         if 'image' in request.files:
