@@ -13,9 +13,8 @@
 6. [Running the App](#running-the-app)
 7. [Usage (Quick Guide)](#usage-quick-guide)
 8. [Important Configuration & Defaults](#important-configuration--defaults)
-9. [Security Notes & To‑Dos](#security-notes--to-dos)
-10. [Extending the Project](#extending-the-project)
-11. [License](#license)
+9. [Extending the Project](#extending-the-project)
+
 
 ---
 
