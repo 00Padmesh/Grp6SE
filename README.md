@@ -83,7 +83,7 @@ source venv/bin/activate
 venv\Scripts\Activate.ps1
 
 # install dependencies
-pip install flask flask-sqlalchemy flask-login
+pip install -r requirements.txt
 ```
 
 3. (Optional) Inspect `config.py`. By default the app uses the bundled configuration:
