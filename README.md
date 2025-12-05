@@ -24,7 +24,7 @@ This portal provides two primary roles:
 - **Organizer** — can create, edit, delete events, upload banners, view and export participant lists (CSV) for events they manage.
 - **Student** — can sign up (with a unique student ID), browse events and register/unregister for events.
 
-Screenshots are available in `backend/static/uploads/`.
+
 
 ---
 
