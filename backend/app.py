@@ -32,7 +32,7 @@ with app.app_context():
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- ROUTES ---
+
 
 @app.route("/")
 def index():
@@ -48,7 +48,7 @@ def signup():
         password = generate_password_hash(request.form["password"])
         role = request.form["role"]
         
-        # Logic for ID: Required for Students, Optional for Organizers
+        
         unique_id = request.form.get("unique_id") 
         if not unique_id:
             unique_id = None
@@ -57,7 +57,7 @@ def signup():
                 flash("Student ID is required for participants")
                 return redirect(url_for("signup"))
             
-            # NEW CHECK: Check if this Student ID already exists in DB
+            
             existing_student = User.query.filter_by(unique_id=unique_id).first()
             if existing_student:
                 flash("This Student ID is already registered! Please login.")
@@ -101,7 +101,7 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
-# --- ORGANIZER DASHBOARD ---
+
 @app.route("/dashboard/organizer", methods=["GET", "POST"])
 @login_required
 def dashboard_organizer():
@@ -110,19 +110,19 @@ def dashboard_organizer():
     
     if request.method == "POST":
         name = request.form["name"]
-        start_date = request.form["start_date"] # CHANGED
-        end_date = request.form["end_date"]     # NEW
+        start_date = request.form["start_date"] 
+        end_date = request.form["end_date"]     
         start_time = request.form["start_time"]
         end_time = request.form["end_time"]
         desc = request.form["description"]
         if end_date < start_date:
             flash("Error: End date cannot be before Start date!")
             return redirect(url_for("dashboard_organizer"))
-        # Image Upload Handling (Optional now)
+       
         image_filename = 'default.jpg'
         if 'image' in request.files:
             file = request.files['image']
-            # Check if user actually uploaded a file (filename will be empty if not)
+            
             if file and file.filename != '' and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -137,11 +137,11 @@ def dashboard_organizer():
         db.session.commit()
         flash("Event Created Successfully!")
     
-    #my_events = Event.query.filter_by(organizer_id=current_user.id).all()
+    
     all_events = Event.query.all()
     return render_template("dashboard_organizer.html", events=all_events)
 
-# --- VIEW PARTICIPANTS ROUTE (NEW) ---
+
 @app.route("/participants/<int:event_id>")
 @login_required
 def view_participants(event_id):
@@ -150,7 +150,7 @@ def view_participants(event_id):
         return "Access Denied"
     return render_template("view_participants.html", event=event)
 
-# --- DOWNLOAD CSV ROUTE (NEW) ---
+
 @app.route("/download_participants/<int:event_id>")
 @login_required
 def download_participants(event_id):
@@ -158,40 +158,30 @@ def download_participants(event_id):
     if event.organizer_id != current_user.id:
         return "Access Denied"
 
-    # Create CSV in memory
     output = io.StringIO()
     writer = csv.writer(output)
     
-    # Header row
     writer.writerow(['Name', 'Student ID', 'Email'])
     
-    # Data rows
     for reg in event.registrations:
         writer.writerow([reg.student.name, reg.student.unique_id, reg.student.email])
     
-    # Prepare response
     return Response(
         output.getvalue(),
         mimetype="text/csv",
         headers={"Content-disposition": f"attachment; filename=participants_{event.id}.csv"}
     )
 
-# --- STUDENT DASHBOARD ---
 @app.route("/dashboard/student")
 @login_required
 def dashboard_student():
     if current_user.role != "participant":
         return "Access Denied"
     
-    # 1. Get ALL events (for the browse section)
     all_events = Event.query.all()
     
-    # 2. Get the specific Event objects the student is registered for
-    #    (We join the Registration and Event tables)
     my_registrations = Registration.query.filter_by(student_id=current_user.id).all()
     my_event_ids = [r.event_id for r in my_registrations]
-    
-    # Create a list of full Event objects that the student has registered for
     my_events_list = [Event.query.get(id) for id in my_event_ids]
     
     return render_template("dashboard_student.html", 
@@ -242,19 +232,19 @@ def delete_event(event_id):
     return redirect(url_for("dashboard_organizer"))
 
 
-# app.py
+
 
 @app.route("/event/edit/<int:event_id>", methods=["GET", "POST"])
 @login_required
 def edit_event(event_id):
     event = Event.query.get_or_404(event_id)
 
-    # SECURITY CHECK: Stop Admin 2 from editing Admin 1's event
+    
     if event.organizer_id != current_user.id:
         return "Access Denied"
 
     if request.method == "POST":
-        # Get data from form
+        
         event.name = request.form["name"]
         event.start_date = request.form["start_date"]
         event.end_date = request.form["end_date"]
@@ -262,12 +252,12 @@ def edit_event(event_id):
         event.end_time = request.form["end_time"]
         event.description = request.form["description"]
 
-        # Date Validation again
+        
         if event.end_date < event.start_date:
             flash("Error: End date cannot be before Start date!")
             return redirect(url_for('edit_event', event_id=event.id))
 
-        # Handle Image Update (Optional)
+        
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename != '' and allowed_file(file.filename):

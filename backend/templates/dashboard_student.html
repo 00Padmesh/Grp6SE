@@ -120,18 +120,17 @@
                 right: 'dayGridMonth,listWeek'
             },
             events: [
-                // Loop through all events to show them on calendar
-                // We highlight the ones the user is registered for in a different color
+                
                 {% for event in events %}
                 {
                     title: '{{ event.name }}',
                     start: '{{ event.start_date }}',
-                    end: '{{ event.end_date }}', // FullCalendar end is exclusive, but for visual this works
+                    end: '{{ event.end_date }}', 
                     {% if event.id in my_event_ids %}
-                        color: '#10b981', // Green for registered
+                        color: '#10b981', 
                         title: '✅ {{ event.name }}'
                     {% else %}
-                        color: '#3b82f6', // Blue for available
+                        color: '#3b82f6', 
                     {% endif %}
                 },
                 {% endfor %}
@@ -140,9 +139,9 @@
         calendar.render();
     });
 
-    // --- MODAL LOGIC (Same as before) ---
+    
     function openModalFromData(btn) {
-        // ... (Keep existing modal logic here) ...
+        
         var name = btn.getAttribute('data-name');
         var date = btn.getAttribute('data-date');
         var start = btn.getAttribute('data-start');
