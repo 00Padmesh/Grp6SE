@@ -46,7 +46,7 @@ Screenshots are available in `backend/static/uploads/`.
 - Flask-Login
 - SQLite (file `college_portal.db`)
 
-Dependencies are listed in `backend/requirements.txt`.
+
 
 ---
 
@@ -84,7 +84,7 @@ source venv/bin/activate
 venv\Scripts\Activate.ps1
 
 # install dependencies
-pip install -r requirements.txt
+pip install flask flask-sqlalchemy flask-login
 ```
 
 3. (Optional) Inspect `config.py`. By default the app uses the bundled configuration:
