@@ -129,18 +129,6 @@ By default the server will start in debug mode on `http://127.0.0.1:5000`.
 
 ---
 
-## Security Notes & To‑Dos
-This repository is a learning/demo application. If you plan to deploy or share it publicly, consider the following improvements:
-
-- **Never store `SECRET_KEY` or organizer codes in source**. Use environment variables.
-- The included `venv/` directory should be removed from version control (`.gitignore` it).
-- Use stronger password hashing and configure Werkzeug/Bcrypt parameters explicitly.
-- Turn off `debug=True` in production and run behind a production-grade WSGI server (Gunicorn / uWSGI).
-- Validate & sanitize all user inputs more thoroughly (file size limits, image scanning).
-- Add tests and role-based access unit tests to ensure only organizers can access organizer-only routes.
-
----
-
 ## Extending the Project (Ideas)
 - Add email verification for signups.
 - Add pagination and search/filter for events.
@@ -149,16 +137,4 @@ This repository is a learning/demo application. If you plan to deploy or share i
 - Move configuration to `env` variables and use Flask-Migrate for DB migrations.
 
 ---
-
-## License
-This project does not include a license file. If you intend to open-source it, add a LICENSE (e.g., MIT) and attribute contributors.
-
----
-
-If you want, I can:
-- generate a polished `README.md` file saved into the repository (I already created this file for you),
-- create a `.gitignore` that excludes `venv/` and `instance/college_portal.db`, or
-- produce a `Procfile` / simple `gunicorn` command for deploying to Heroku-like services.
-
-Tell me which one you want next.
 
